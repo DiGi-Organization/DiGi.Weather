@@ -7,9 +7,13 @@ namespace DiGi.Weather.Classes
 {
     /// <summary>
     /// Represents a single weather record containing various meteorological measurements.
+    /// <para><b>Missing values.</b> A reading that is missing holds the EnergyPlus weather file sentinel of its field, never <c>NaN</c> or 0: 9999 for the three radiation fields, 999 for albedo and snow depth (<see cref="Constants.MissingValue"/>). Records read from an EPW file already store these sentinels, and a stored record is rebuilt through the <see cref="JsonObject"/> constructor without normalisation, so one convention holds for every record. Read a field through its <c>Query.*Value</c> helper (<see cref="Query.GlobalHorizontalRadiationValue(WeatherRecord?)"/>, <see cref="Query.AlbedoValue(WeatherRecord?)"/>, …), which answers null for a missing reading; a producer of live data writes the sentinel for a reading it does not have.</para>
     /// </summary>
     public class WeatherRecord : Core.Classes.SerializableObject, IWeatherRecord
     {
+        [JsonInclude, JsonPropertyName(nameof(Albedo))]
+        private readonly float albedo = 0;
+
         [JsonInclude, JsonPropertyName(nameof(AtmosphericStationPressure))]
         private readonly float atmosphericStationPressure = 0;
 
@@ -95,7 +99,7 @@ namespace DiGi.Weather.Classes
         /// <param name="aerosolOpticalDepth">The aerosol optical depth, in thousandths.</param>
         /// <param name="snowDepth">The snow depth, in cm.</param>
         /// <param name="daysSinceLastSnowfall">The number of days since the last snowfall.</param>
-        /// <param name="albedo">The albedo.</param>
+        /// <param name="albedo">The albedo, dimensionless; <see cref="Constants.MissingValue.Albedo"/> for a missing reading.</param>
         /// <param name="liquidPrecipitationDepth">The liquid precipitation depth, in mm.</param>
         /// <param name="liquidPrecipitationQuantity">The liquid precipitation quantity, in hours.</param>
         public WeatherRecord(DateTime dateTime, string? dataSourceAndUncertaintyFlags, float dryBulbTemperature, float dewPointTemperature, float relativeHumidity, float atmosphericStationPressure, float extraterrestrialHorizontalRadiation, float extraterrestrialDirectNormalRadiation, float horizontalInfraredRadiationIntensity, float globalHorizontalRadiation, float directNormalRadiation, float diffuseHorizontalRadiation, float globalHorizontalIlluminance, float directNormalIlluminance, float diffuseHorizontalIlluminance, float zenithLuminance, float windDirection, float windSpeed, int totalSkyCover, int opaqueSkyCover, float visibility, float ceilingHeight, int presentWeatherObservation, string? presentWeatherCodes, float precipitableWater, float aerosolOpticalDepth, float snowDepth, int daysSinceLastSnowfall, float albedo, float liquidPrecipitationDepth, float liquidPrecipitationQuantity)
@@ -118,6 +122,7 @@ namespace DiGi.Weather.Classes
             this.opaqueSkyCover = opaqueSkyCover;
             this.ceilingHeight = ceilingHeight;
             this.snowDepth = snowDepth;
+            this.albedo = albedo;
         }
 
         /// <summary>
@@ -147,6 +152,7 @@ namespace DiGi.Weather.Classes
                 opaqueSkyCover = weatherRecord.opaqueSkyCover;
                 ceilingHeight = weatherRecord.ceilingHeight;
                 snowDepth = weatherRecord.snowDepth;
+                albedo = weatherRecord.albedo;
             }
         }
 
@@ -157,6 +163,18 @@ namespace DiGi.Weather.Classes
         public WeatherRecord(JsonObject? jsonObject)
             : base(jsonObject)
         {
+        }
+
+        /// <summary>
+        /// Gets the albedo, dimensionless. A raw value equal to <see cref="Constants.MissingValue.Albedo"/> (999) marks a missing reading rather than a measurement; <see cref="Query.AlbedoValue(WeatherRecord?)"/> answers null for it.
+        /// </summary>
+        [JsonIgnore]
+        public float Albedo
+        {
+            get
+            {
+                return albedo;
+            }
         }
 
         /// <summary>
@@ -375,4 +393,4 @@ namespace DiGi.Weather.Classes
             }
         }
     }
-}
+}

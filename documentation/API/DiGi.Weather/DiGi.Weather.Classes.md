@@ -214,6 +214,8 @@ Implements [GetEnumerator\(\)](https://learn.microsoft.com/en-us/dotnet/api/syst
 
 Represents a single weather record containing various meteorological measurements\.
 
+<b>Missing values.</b> A reading that is missing holds the EnergyPlus weather file sentinel of its field, never `NaN` or 0: 9999 for the three radiation fields, 999 for albedo and snow depth ([MissingValue](DiGi.Weather.Constants.md#DiGi.Weather.Constants.MissingValue 'DiGi\.Weather\.Constants\.MissingValue')). Records read from an EPW file already store these sentinels, and a stored record is rebuilt through the [System\.Text\.Json\.Nodes\.JsonObject](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.nodes.jsonobject 'System\.Text\.Json\.Nodes\.JsonObject') constructor without normalisation, so one convention holds for every record. Read a field through its `Query.*Value` helper ([GlobalHorizontalRadiationValue\(this WeatherRecord\)](DiGi.Weather.md#DiGi.Weather.Query.GlobalHorizontalRadiationValue(thisDiGi.Weather.Classes.WeatherRecord) 'DiGi\.Weather\.Query\.GlobalHorizontalRadiationValue\(this DiGi\.Weather\.Classes\.WeatherRecord\)'), [AlbedoValue\(this WeatherRecord\)](DiGi.Weather.md#DiGi.Weather.Query.AlbedoValue(thisDiGi.Weather.Classes.WeatherRecord) 'DiGi\.Weather\.Query\.AlbedoValue\(this DiGi\.Weather\.Classes\.WeatherRecord\)'), …), which answers null for a missing reading; a producer of live data writes the sentinel for a reading it does not have.
+
 ```csharp
 public class WeatherRecord : DiGi.Core.Classes.SerializableObject, DiGi.Weather.Interfaces.IWeatherRecord, DiGi.Weather.Interfaces.IWeatherSerializableObject, DiGi.Weather.Interfaces.IWeatherObject, DiGi.Core.Interfaces.IObject, DiGi.Core.Interfaces.ISerializableObject, DiGi.Core.Interfaces.ICloneableObject<DiGi.Core.Interfaces.ISerializableObject>, DiGi.Core.Interfaces.ICloneableObject
 ```
@@ -423,7 +425,7 @@ The number of days since the last snowfall\.
 
 `albedo` [System\.Single](https://learn.microsoft.com/en-us/dotnet/api/system.single 'System\.Single')
 
-The albedo\.
+The albedo, dimensionless; [Albedo](DiGi.Weather.Constants.md#DiGi.Weather.Constants.MissingValue.Albedo 'DiGi\.Weather\.Constants\.MissingValue\.Albedo') for a missing reading\.
 
 <a name='DiGi.Weather.Classes.WeatherRecord.WeatherRecord(System.DateTime,string,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,float,int,int,float,float,int,string,float,float,float,int,float,float,float).liquidPrecipitationDepth'></a>
 
@@ -454,6 +456,19 @@ public WeatherRecord(System.Text.Json.Nodes.JsonObject? jsonObject);
 
 The JSON object containing the weather record data\.
 ### Properties
+
+<a name='DiGi.Weather.Classes.WeatherRecord.Albedo'></a>
+
+## WeatherRecord\.Albedo Property
+
+Gets the albedo, dimensionless\. A raw value equal to [Albedo](DiGi.Weather.Constants.md#DiGi.Weather.Constants.MissingValue.Albedo 'DiGi\.Weather\.Constants\.MissingValue\.Albedo') \(999\) marks a missing reading rather than a measurement; [AlbedoValue\(this WeatherRecord\)](DiGi.Weather.md#DiGi.Weather.Query.AlbedoValue(thisDiGi.Weather.Classes.WeatherRecord) 'DiGi\.Weather\.Query\.AlbedoValue\(this DiGi\.Weather\.Classes\.WeatherRecord\)') answers null for it\.
+
+```csharp
+public float Albedo { get; }
+```
+
+#### Property Value
+[System\.Single](https://learn.microsoft.com/en-us/dotnet/api/system.single 'System\.Single')
 
 <a name='DiGi.Weather.Classes.WeatherRecord.AtmosphericStationPressure'></a>
 
