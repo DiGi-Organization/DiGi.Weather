@@ -57,6 +57,21 @@ public const float DirectNormalRadiation = 9999;
 #### Field Value
 [System\.Single](https://learn.microsoft.com/en-us/dotnet/api/system.single 'System\.Single')
 
+<a name='DiGi.Weather.Constants.MissingValue.DryBulbTemperature'></a>
+
+## MissingValue\.DryBulbTemperature Field
+
+The value 99\.9 that marks a missing dry bulb temperature reading, in °C \(DiGi\-Organization/DiGi\.Weather\#4\)\.
+
+The `\missing 99.9` of field N6 in the EnergyPlus Weather File (EPW) Data Dictionary (EnergyPlus 9.0 Auxiliary Programs), whose valid range is −70 to 70 °C. Like the other markers it is matched exactly.
+
+```csharp
+public const float DryBulbTemperature = 99.9;
+```
+
+#### Field Value
+[System\.Single](https://learn.microsoft.com/en-us/dotnet/api/system.single 'System\.Single')
+
 <a name='DiGi.Weather.Constants.MissingValue.GlobalHorizontalRadiation'></a>
 
 ## MissingValue\.GlobalHorizontalRadiation Field
